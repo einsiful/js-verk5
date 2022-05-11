@@ -73,37 +73,38 @@ i.addEventListener('input', function () {
 //    console.log(users)
 }, false);
 
+// Sýnir allar myndir eftir síun
+function show(verd) {
+    // Heldur utan um hvaða myndir til að sýna eða ekki
+    let toShow = new Array(users.length).fill(true);
 
-
-
-
-//Function
-function show(verd){
-    let showprice = listi_sorted.map(listinn => listinn.price <= verd);
-    //console.log("hello Wordl",showprice)
+    // Filterar eftir verðum
     for(let i = 0; i < users.length; i++){
-        //console.log(users[i])
-        //console.log(userCardContainer[i])
-        if(showprice[i] == true){
+        if(!(users[i].price <= verd)){
+            toShow[i] = false;
+        } 
+    }
+
+    // Filterar eftir dagsetningu
+    let min = new Date(dateSearchStart.value)
+    let max = new Date(dateSearchEnd.value)
+    if (dateSearchStart.value && dateSearchEnd.value)
+        for(let i = 0; i < users.length; i++){
+            let date = new Date(users[i].date)
+            // Checkar hvort tímabilið er á milli min-max
+            if(!(date.getTime() >= min.getTime() && date.getTime() <= max.getTime())){
+                toShow[i] = false;
+            }
+    }
+    
+    // Sýnir allar myndir eftir síunum
+    for (let i = 0; i < users.length; i++) {
+        if (toShow[i]) {
             users[i].element.classList.remove("hide")
-        }else{
-            users[i].element.classList.add("hide");
+        } else {
+            users[i].element.classList.add("hide")
         }
     }
-    /*for(let i = 0; i < dates.length; i++){
-        let date = new Date(
-            users.date
-        )
-        let minn = new Date(dateSearchStart.minn)
-        let maxx = new Date(dateSearchStart.maxx)
-        if(date.getTime() >= minn.getTime() && date.getTime() <= maxx.getTime()){
-            users[i].element.classList.remove("hide");
-        }else{
-            console.log(minn, maxx, date)
-            users[i].element.classList.add("hide");
-        }
-    }*/
-    //console.log("hello", showdate)
     
 }
 //Hérna er ég að telja öll stök í listanum og set það inní users
@@ -152,13 +153,13 @@ let dateSearchEnd = document.querySelector("[data-end-date]")
 
 //Hérna er ég með min og max af dögunum
 //console.log(users)
-let dates = users.map(user => {return user.date})
-console.log(dates)
-dates = dates.sort((a,b) => {
+dates = users.map(user=>user.date).sort((a,b) => {
     let date1 = new Date(a)
     let date2 = new Date(b)
-    return date1.getTime() < date2.getTime() ? date1 : date2;
+    return date1.getTime() - date2.getTime();
 })
+
+
 dateSearchStart.min = dates[0]
 dateSearchEnd.min = dates[0]
 
@@ -168,11 +169,13 @@ dateSearchEnd.max = dates[dates.length-1]
 dateSearchStart.addEventListener("change", e => {
     let gildi = e.target.value
     console.log(gildi)
+        show(i.value); 
 })
 
 dateSearchEnd.addEventListener("change", e => {
     let gildi = e.target.value
     console.log(gildi)
+        show(i.value);
 })
 //Kalla á neðsta pricið
 show(min)
